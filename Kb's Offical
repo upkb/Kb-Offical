@@ -54,7 +54,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 375)
+mainFrame.Size = UDim2.new(0, 400, 0, 500)
 mainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BorderSizePixel = 0
@@ -71,6 +71,20 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 24
 titleLabel.Parent = mainFrame
+
+-- Decorative Art on Right Side
+local artImage = Instance.new("ImageLabel")
+artImage.Size = UDim2.new(0, 120, 0, 200)
+artImage.Position = UDim2.new(1, -130, 0.5, -100)
+artImage.BackgroundTransparency = 1
+artImage.Image = "rbxassetid://10591468138" -- sample decorative sci-fi image
+artImage.ImageColor3 = Color3.fromRGB(0, 170, 255)
+artImage.Parent = mainFrame
+
+
+
+
+
 
 -- Toggle template
 local function createToggle(name, yPos)
@@ -715,42 +729,4 @@ localPlayer.CharacterAdded:Connect(function(char)
 	Character = char
 	RootPart = Character:WaitForChild("HumanoidRootPart")
 	if flyEnabled then stopFlying() end
-end)
-
-
-
--- Aimbot Auto/Manual Prediction Controls
-local autoPredictionToggle, autoPredictionCircle = createToggle("Auto Prediction", 340)
-local autoPredictionEnabled = false
-
-autoPredictionToggle.MouseButton1Click:Connect(function()
-	autoPredictionEnabled = not autoPredictionEnabled
-	autoPredictionToggle.BackgroundColor3 = autoPredictionEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
-	autoPredictionCircle.Position = autoPredictionEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
-end)
-
-manualPredictionSlider.FocusLost:Connect(function()
-	local val = tonumber(manualPredictionSlider.Text)
-	if val and val >= 0 and val <= 1 then
-		getgenv().Prediction = val
-	end
-end)
-
-task.spawn(function()
-	while true do
-		task.wait(1)
-		if autoPredictionEnabled then
-			local pingStat = game:GetService("Stats"):FindFirstChild("Network"):FindFirstChild("ServerStatsItem"):FindFirstChild("Data Ping")
-			if pingStat then
-				local ping = pingStat:GetValue()
-				if typeof(ping) == "number" then
-					if ping < 40 then getgenv().Prediction = 0.125
-					elseif ping < 70 then getgenv().Prediction = 0.15
-					elseif ping < 100 then getgenv().Prediction = 0.17
-					elseif ping < 130 then getgenv().Prediction = 0.19
-					else getgenv().Prediction = 0.21 end
-				end
-			end
-		end
-	end
 end)
