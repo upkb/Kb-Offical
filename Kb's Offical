@@ -1,3 +1,4 @@
+
 -- Right-side Toggle Creator
 local function createRightToggle(name, yPos)
 	local label = Instance.new("TextLabel")
@@ -53,7 +54,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 270)
+mainFrame.Size = UDim2.new(0, 400, 0, 375)
 mainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BorderSizePixel = 0
@@ -70,30 +71,6 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 24
 titleLabel.Parent = mainFrame
-
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
-titleLabel.Position = UDim2.new(0, 85, 0, 150)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "More Coming Soon!!"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 24
-titleLabel.Parent = mainFrame
-
--- Decorative Art on Right Side
-local artImage = Instance.new("ImageLabel")
-artImage.Size = UDim2.new(0, 120, 0, 200)
-artImage.Position = UDim2.new(1, -130, 0.5, -100)
-artImage.BackgroundTransparency = 1
-artImage.Image = "rbxassetid://10591468138" -- sample decorative sci-fi image
-artImage.ImageColor3 = Color3.fromRGB(0, 170, 255)
-artImage.Parent = mainFrame
-
-
-
-
-
 
 -- Toggle template
 local function createToggle(name, yPos)
@@ -218,7 +195,7 @@ end)
 -- SPEED Toggle
 local speedToggle, speedCircle = createToggle("Speed", 100)
 local speedEnabled = false
-local Speed = 2.5
+local Speed = 55
 
 speedToggle.MouseButton1Click:Connect(function()
 	speedEnabled = not speedEnabled
@@ -240,10 +217,10 @@ localPlayer.CharacterAdded:Connect(function(char)
 end)
 
 RunService.RenderStepped:Connect(function()
-	if speedEnabled and RootPart then
-		local moveDir = Character and Character:FindFirstChild("Humanoid") and Character.Humanoid.MoveDirection or Vector3.zero
+	if speedEnabled and RootPart and Character and Character:FindFirstChild("Humanoid") then
+		local moveDir = Character.Humanoid.MoveDirection
 		if moveDir.Magnitude > 0 then
-			RootPart.CFrame = RootPart.CFrame + (moveDir * Speed)
+			RootPart.AssemblyLinearVelocity = moveDir * Speed
 		end
 	end
 end)
@@ -277,7 +254,7 @@ UIS.InputBegan:Connect(function(input, isProcessed)
 end)
 
 -- Trigger Bot Toggle
-local triggerToggle, triggerCircle = createToggle("Trigger Bot", 140)
+local triggerToggle, triggerCircle = createToggle("Trigger Bot", 180)
 local triggerBotEnabled = false
 
 triggerToggle.MouseButton1Click:Connect(function()
@@ -298,7 +275,7 @@ end)
 
 
 -- Trigger Bot Toggle
-local triggerToggle, triggerCircle = createToggle("Trigger Bot", 140)
+local triggerToggle, triggerCircle = createToggle("Trigger Bot", 180)
 _G.triggerbot = false
 
 triggerToggle.MouseButton1Click:Connect(function()
@@ -378,8 +355,6 @@ button.TextTransparency = 1
 button.BackgroundTransparency = 1
 button.Parent = frame
 
-
-
 local function slideAndFadeIn()
 	local fadeTime = 0.5
 	TweenService:Create(frame, TweenInfo.new(fadeTime), {
@@ -449,7 +424,7 @@ end)
 
 -- Aim Bot Toggle
 -- Anti-Stomp Toggle
-local antiStompToggle, antiStompCircle = createToggle("Anti-Stomp", 220)
+local antiStompToggle, antiStompCircle = createToggle("Anti-Stomp", 260)
 local antiStompEnabled = false
 
 antiStompToggle.MouseButton1Click:Connect(function()
@@ -471,7 +446,7 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
-local aimbotToggle, aimbotCircle = createToggle("Aim Bot", 180)
+local aimbotToggle, aimbotCircle = createToggle("Aim Bot", 220)
 local AimlockEnabled = false
 local Locked = false
 local Victim
@@ -545,45 +520,6 @@ RunService.RenderStepped:Connect(function()
 		local predictedPosition = targetPart.Position + targetPart.Velocity * getgenv().Prediction
 		local desiredCFrame = CFrame.new(Camera.CFrame.Position, predictedPosition)
 		Camera.CFrame = desiredCFrame
-	end
-end)
-
-
-
-
-
-
-
-
--- Blue dot loop (only runs if toggle is on)
-RunService.Heartbeat:Connect(function()
-	if not dotAimbotEnabled then return end
-
-	local closest = getSilentTarget()
-	if closest then
-		if currentDotTarget ~= closest then
-			if currentDotTarget and currentDotTarget:FindFirstChild("DotMarker") then
-				currentDotTarget.DotMarker:Destroy()
-			end
-			local marker = Instance.new("BillboardGui")
-			marker.Name = "DotMarker"
-			marker.Size = UDim2.new(0, 10, 0, 10)
-			marker.Adornee = closest
-			marker.AlwaysOnTop = true
-			marker.Parent = closest
-
-			local dot = Instance.new("Frame")
-			dot.Size = UDim2.new(1, 0, 1, 0)
-			dot.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-			dot.BorderSizePixel = 0
-			dot.Parent = marker
-
-			local round = Instance.new("UICorner")
-			round.CornerRadius = UDim.new(1, 0)
-			round.Parent = dot
-
-			currentDotTarget = closest
-		end
 	end
 end)
 
@@ -663,7 +599,7 @@ end)
 
 
 -- Fake Lag Toggle
-local fakeLagToggle, fakeLagCircle = createRightToggle("Fake Lag", 60)
+local fakeLagToggle, fakeLagCircle = createToggle("Fake Lag", 300)
 local fakeLagEnabled = false
 
 fakeLagToggle.MouseButton1Click:Connect(function()
@@ -681,6 +617,140 @@ task.spawn(function()
 			root.Anchored = true
 			task.wait(0.18) -- hold lag longer
 			root.Anchored = false
+		end
+	end
+end)
+
+
+
+-- Fly Toggle
+local flyToggle, flyCircle = createToggle("Fly", 140)
+local flyEnabled = false
+local flying = false
+local flySpeed = 555
+local bodyGyro, bodyVelocity
+
+local function startFlying()
+	if not Character or not RootPart then return end
+	local humanoid = Character:FindFirstChildOfClass("Humanoid")
+	if humanoid then humanoid.PlatformStand = true end
+
+	bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.D = 1000
+	bodyGyro.P = 100000
+	bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+	bodyGyro.CFrame = RootPart.CFrame
+	bodyGyro.Parent = RootPart
+
+	bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+	bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+	bodyVelocity.Parent = RootPart
+
+	flying = true
+end
+
+local function stopFlying()
+	if bodyGyro then bodyGyro:Destroy() end
+	if bodyVelocity then bodyVelocity:Destroy() end
+	local humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+	if humanoid then humanoid.PlatformStand = false end
+	flying = false
+end
+
+flyToggle.MouseButton1Click:Connect(function()
+	flyEnabled = not flyEnabled
+	flyToggle.BackgroundColor3 = flyEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	flyCircle.Position = flyEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+	if flyEnabled then
+		startFlying()
+	else
+		stopFlying()
+	end
+end)
+
+UIS.InputBegan:Connect(function(input, processed)
+	if not processed and input.KeyCode == Enum.KeyCode.C then
+		flyEnabled = not flyEnabled
+		flyToggle.BackgroundColor3 = flyEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+		flyCircle.Position = flyEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+		if flyEnabled then
+			startFlying()
+		else
+			stopFlying()
+		end
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if flying and RootPart then
+		local cam = workspace.CurrentCamera
+		local moveDirection = Vector3.zero
+		if UIS:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + cam.CFrame.LookVector end
+		if UIS:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - cam.CFrame.LookVector end
+		if UIS:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - cam.CFrame.RightVector end
+		if UIS:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + cam.CFrame.RightVector end
+		if UIS:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0, 1, 0) end
+		if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then moveDirection = moveDirection - Vector3.new(0, 1, 0) end
+
+		if moveDirection.Magnitude > 0 then
+			if bodyVelocity then
+				bodyVelocity.Velocity = moveDirection * flySpeed
+			end
+		else
+			if bodyVelocity then
+				bodyVelocity.Velocity = Vector3.zero
+			end
+		end
+
+		if bodyGyro then
+			bodyGyro.CFrame = cam.CFrame
+		end
+	end
+end)
+
+-- Disable flying on respawn
+localPlayer.CharacterAdded:Connect(function(char)
+	task.wait(1)
+	Character = char
+	RootPart = Character:WaitForChild("HumanoidRootPart")
+	if flyEnabled then stopFlying() end
+end)
+
+
+
+-- Aimbot Auto/Manual Prediction Controls
+local autoPredictionToggle, autoPredictionCircle = createToggle("Auto Prediction", 340)
+local autoPredictionEnabled = false
+
+autoPredictionToggle.MouseButton1Click:Connect(function()
+	autoPredictionEnabled = not autoPredictionEnabled
+	autoPredictionToggle.BackgroundColor3 = autoPredictionEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	autoPredictionCircle.Position = autoPredictionEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+manualPredictionSlider.FocusLost:Connect(function()
+	local val = tonumber(manualPredictionSlider.Text)
+	if val and val >= 0 and val <= 1 then
+		getgenv().Prediction = val
+	end
+end)
+
+task.spawn(function()
+	while true do
+		task.wait(1)
+		if autoPredictionEnabled then
+			local pingStat = game:GetService("Stats"):FindFirstChild("Network"):FindFirstChild("ServerStatsItem"):FindFirstChild("Data Ping")
+			if pingStat then
+				local ping = pingStat:GetValue()
+				if typeof(ping) == "number" then
+					if ping < 40 then getgenv().Prediction = 0.125
+					elseif ping < 70 then getgenv().Prediction = 0.15
+					elseif ping < 100 then getgenv().Prediction = 0.17
+					elseif ping < 130 then getgenv().Prediction = 0.19
+					else getgenv().Prediction = 0.21 end
+				end
+			end
 		end
 	end
 end)
