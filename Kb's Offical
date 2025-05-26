@@ -1,0 +1,674 @@
+-- Right-side Toggle Creator
+local function createRightToggle(name, yPos)
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0, 100, 0, 20)
+	label.Position = UDim2.new(1, -180, 0, yPos)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.Font = Enum.Font.SourceSansBold
+	label.TextSize = 16
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = mainFrame
+
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 60, 0, 30)
+	button.Position = UDim2.new(1, -70, 0, yPos - 5)
+	button.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
+	button.Text = ""
+	button.Parent = mainFrame
+
+	local corner = Instance.new("UICorner", button)
+	corner.CornerRadius = UDim.new(1, 0)
+
+	local circle = Instance.new("Frame", button)
+	circle.Size = UDim2.new(0, 26, 0, 26)
+	circle.Position = UDim2.new(0, 2, 0, 2)
+	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	circle.Parent = button
+
+	local circleCorner = Instance.new("UICorner", circle)
+	circleCorner.CornerRadius = UDim.new(1, 0)
+
+	return button, circle
+end
+
+
+-- Kb's GUI with ESP + Speed toggle, working UI and features
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local TextChatService = game:GetService("TextChatService")
+
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+local Character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Dodo Ahh Script"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 400, 0, 270)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Dodo Ahh Script"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 24
+titleLabel.Parent = mainFrame
+
+-- Decorative Art on Right Side
+local artImage = Instance.new("ImageLabel")
+artImage.Size = UDim2.new(0, 120, 0, 200)
+artImage.Position = UDim2.new(1, -130, 0.5, -100)
+artImage.BackgroundTransparency = 1
+artImage.Image = "rbxassetid://10591468138" -- sample decorative sci-fi image
+artImage.ImageColor3 = Color3.fromRGB(0, 170, 255)
+artImage.Parent = mainFrame
+
+
+
+
+
+
+-- Toggle template
+local function createToggle(name, yPos)
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0, 60, 0, 20)
+	label.Position = UDim2.new(0, 20, 0, yPos)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.Font = Enum.Font.SourceSansBold
+	label.TextSize = 16
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = mainFrame
+
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 60, 0, 30)
+	button.Position = UDim2.new(0, 120, 0, yPos - 5)
+	button.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
+	button.Text = ""
+	button.Parent = mainFrame
+
+	local corner = Instance.new("UICorner", button)
+	corner.CornerRadius = UDim.new(1, 0)
+
+	local circle = Instance.new("Frame", button)
+	circle.Size = UDim2.new(0, 26, 0, 26)
+	circle.Position = UDim2.new(0, 2, 0, 2)
+	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+	local circleCorner = Instance.new("UICorner", circle)
+	circleCorner.CornerRadius = UDim.new(1, 0)
+
+	return button, circle
+end
+
+-- ESP Toggle
+local espToggle, espCircle = createToggle("ESP", 60)
+local espEnabled = false
+local activeHighlights, activeNameTags = {}, {}
+
+local function createESPOutline(character, player)
+	if not character or character:FindFirstChild("ESPHighlight") then return end
+
+	local highlight = Instance.new("Highlight")
+	highlight.Name = "ESPHighlight"
+	highlight.Adornee = character
+	highlight.FillTransparency = 0.5
+	highlight.FillColor = Color3.fromRGB(0, 170, 255)
+	highlight.OutlineTransparency = 0
+	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+	highlight.Parent = character
+	table.insert(activeHighlights, highlight)
+
+	local head = character:FindFirstChild("Head")
+	if head and not character:FindFirstChild("NameTag") then
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "NameTag"
+		billboard.Adornee = head
+		billboard.Size = UDim2.new(0, 100, 0, 20)
+		billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = character
+
+		local nameLabel = Instance.new("TextLabel")
+		nameLabel.Size = UDim2.new(1, 0, 1, 0)
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.Text = player.Name
+		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		nameLabel.TextStrokeTransparency = 0
+		nameLabel.TextScaled = false
+		nameLabel.Font = Enum.Font.Gotham
+		nameLabel.TextSize = 10
+		nameLabel.Parent = billboard
+
+		table.insert(activeNameTags, billboard)
+	end
+end
+
+local function enableESP()
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer and player.Character then
+			createESPOutline(player.Character, player)
+		end
+	end
+end
+
+local function disableESP()
+	for _, item in ipairs(activeHighlights) do if item and item.Parent then item:Destroy() end end
+	for _, tag in ipairs(activeNameTags) do if tag and tag.Parent then tag:Destroy() end end
+	table.clear(activeHighlights)
+	table.clear(activeNameTags)
+end
+
+espToggle.MouseButton1Click:Connect(function()
+	espEnabled = not espEnabled
+	espToggle.BackgroundColor3 = espEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	espCircle.Position = espEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+	if espEnabled then enableESP() else disableESP() end
+end)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player ~= localPlayer then
+		player.CharacterAdded:Connect(function(char)
+			if espEnabled then
+				task.wait(1)
+				createESPOutline(char, player)
+			end
+		end)
+	end
+end
+Players.PlayerAdded:Connect(function(player)
+	if player ~= localPlayer then
+		player.CharacterAdded:Connect(function(char)
+			if espEnabled then
+				task.wait(1)
+				createESPOutline(char, player)
+			end
+		end)
+	end
+end)
+
+-- SPEED Toggle
+local speedToggle, speedCircle = createToggle("Speed", 100)
+local speedEnabled = false
+local Speed = 2.5
+
+speedToggle.MouseButton1Click:Connect(function()
+	speedEnabled = not speedEnabled
+	speedToggle.BackgroundColor3 = speedEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	speedCircle.Position = speedEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+UIS.InputBegan:Connect(function(input, processed)
+	if not processed and input.KeyCode == Enum.KeyCode.Z then
+		speedEnabled = not speedEnabled
+		speedToggle.BackgroundColor3 = speedEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+		speedCircle.Position = speedEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+	end
+end)
+
+localPlayer.CharacterAdded:Connect(function(char)
+	Character = char
+	RootPart = Character:WaitForChild("HumanoidRootPart")
+end)
+
+RunService.RenderStepped:Connect(function()
+	if speedEnabled and RootPart then
+		local moveDir = Character and Character:FindFirstChild("Humanoid") and Character.Humanoid.MoveDirection or Vector3.zero
+		if moveDir.Magnitude > 0 then
+			RootPart.CFrame = RootPart.CFrame + (moveDir * Speed)
+		end
+	end
+end)
+
+
+-- Re-enable toggles after respawn
+localPlayer.CharacterAdded:Connect(function(char)
+	task.wait(1)
+	Character = char
+	RootPart = Character:WaitForChild("HumanoidRootPart")
+
+	if espEnabled then enableESP() end
+end)
+
+
+-- Chat command to close the GUI
+TextChatService.OnIncomingMessage = function(message)
+	if message.TextSource and message.TextSource.UserId == localPlayer.UserId then
+		if message.Text:lower() == ".close" then
+			disableESP()
+			screenGui:Destroy()
+		end
+	end
+end
+
+-- RightControl to hide/show GUI
+UIS.InputBegan:Connect(function(input, isProcessed)
+	if not isProcessed and input.KeyCode == Enum.KeyCode.RightControl then
+		mainFrame.Visible = not mainFrame.Visible
+	end
+end)
+
+-- Trigger Bot Toggle
+local triggerToggle, triggerCircle = createToggle("Trigger Bot", 140)
+local triggerBotEnabled = false
+
+triggerToggle.MouseButton1Click:Connect(function()
+	triggerBotEnabled = not triggerBotEnabled
+	triggerToggle.BackgroundColor3 = triggerBotEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	triggerCircle.Position = triggerBotEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+-- T Key toggle for Trigger Bot
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
+		_G.triggerbot = not _G.triggerbot
+		triggerBotEnabled = _G.triggerbot
+		triggerToggle.BackgroundColor3 = _G.triggerbot and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+		triggerCircle.Position = _G.triggerbot and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+	end
+end)
+
+
+-- Trigger Bot Toggle
+local triggerToggle, triggerCircle = createToggle("Trigger Bot", 140)
+_G.triggerbot = false
+
+triggerToggle.MouseButton1Click:Connect(function()
+	_G.triggerbot = not _G.triggerbot
+	triggerToggle.BackgroundColor3 = _G.triggerbot and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	triggerCircle.Position = _G.triggerbot and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+-- T Key toggle for Trigger Bot
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
+		_G.triggerbot = not _G.triggerbot
+		triggerBotEnabled = _G.triggerbot
+		triggerToggle.BackgroundColor3 = _G.triggerbot and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+		triggerCircle.Position = _G.triggerbot and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+	end
+end)
+
+-- Trigger Bot Logic and UI
+local TweenService = game:GetService("TweenService")
+local screenGui = Instance.new("ScreenGui", localPlayer:WaitForChild("PlayerGui"))
+screenGui.Name = "Kbs Notification"
+screenGui.IgnoreGuiInset = true
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(1, 200, 1, -30)
+frame.AnchorPoint = Vector2.new(1, 1)
+frame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+frame.BackgroundTransparency = 1
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local image = Instance.new("ImageLabel")
+image.Size = UDim2.new(0, 64, 0, 64)
+image.Position = UDim2.new(0, 10, 0.5, -32)
+image.BackgroundTransparency = 1
+image.Image = "rbxassetid://92752140307231"
+image.ImageTransparency = 1
+image.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -120, 0, 25)
+title.Position = UDim2.new(0, 50, 0, 10)
+title.Text = "Made By Upkb"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 20
+title.Font = Enum.Font.SourceSansBold
+title.BackgroundTransparency = 1
+title.TextTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+local message = Instance.new("TextLabel")
+message.Size = UDim2.new(1, -90, 0, 50)
+message.Position = UDim2.new(0, 60, 0, 35)
+message.Text = "You Have Injected\nUpkb On Discord"
+message.TextColor3 = Color3.fromRGB(200, 200, 200)
+message.TextSize = 14
+message.Font = Enum.Font.SourceSans
+message.BackgroundTransparency = 1
+message.TextTransparency = 1
+message.TextXAlignment = Enum.TextXAlignment.Left
+message.TextYAlignment = Enum.TextYAlignment.Top
+message.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, 2, 0, 30)
+button.Position = UDim2.new(0, 0, 1, -30)
+button.Text = "Don't Show Again"
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.TextSize = 16
+button.Font = Enum.Font.SourceSansBold
+button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+button.BorderSizePixel = 0
+button.TextTransparency = 1
+button.BackgroundTransparency = 1
+button.Parent = frame
+
+local function slideAndFadeIn()
+	local fadeTime = 0.5
+	TweenService:Create(frame, TweenInfo.new(fadeTime), {
+		Position = UDim2.new(1, -40, 1, -30),
+		BackgroundTransparency = 0.2
+	}):Play()
+	TweenService:Create(image, TweenInfo.new(fadeTime), {ImageTransparency = 0}):Play()
+	TweenService:Create(title, TweenInfo.new(fadeTime), {TextTransparency = 0}):Play()
+	TweenService:Create(message, TweenInfo.new(fadeTime), {TextTransparency = 0}):Play()
+	TweenService:Create(button, TweenInfo.new(fadeTime), {
+		TextTransparency = 0,
+		BackgroundTransparency = 0.1
+	}):Play()
+end
+
+local function slideAndFadeOut()
+	local fadeTime = 0.5
+	TweenService:Create(frame, TweenInfo.new(fadeTime), {
+		Position = UDim2.new(1, 200, 1, -30),
+		BackgroundTransparency = 1
+	}):Play()
+	TweenService:Create(image, TweenInfo.new(fadeTime), {ImageTransparency = 1}):Play()
+	TweenService:Create(title, TweenInfo.new(fadeTime), {TextTransparency = 1}):Play()
+	TweenService:Create(message, TweenInfo.new(fadeTime), {TextTransparency = 1}):Play()
+	TweenService:Create(button, TweenInfo.new(fadeTime), {
+		TextTransparency = 1,
+		BackgroundTransparency = 1
+	}):Play()
+	task.delay(fadeTime, function()
+		screenGui:Destroy()
+	end)
+end
+
+button.MouseButton1Click:Connect(slideAndFadeOut)
+slideAndFadeIn()
+
+-- Ultra-fast TriggerBot logic
+local mouse = localPlayer:GetMouse()
+local clicked = false
+RunService.Heartbeat:Connect(function()
+	if not _G.triggerbot then
+		if clicked then
+			mouse1release()
+			clicked = false
+		end
+		return
+	end
+
+	local target = mouse.Target
+	if target then
+		local model = target:FindFirstAncestorOfClass("Model")
+		local humanoid = model and model:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.Health > 0 and model ~= localPlayer.Character then
+			if not clicked then
+				mouse1press()
+				clicked = true
+			end
+			return
+		end
+	end
+
+	if clicked then
+		mouse1release()
+		clicked = false
+	end
+end)
+
+-- Aim Bot Toggle
+-- Anti-Stomp Toggle
+local antiStompToggle, antiStompCircle = createToggle("Anti-Stomp", 220)
+local antiStompEnabled = false
+
+antiStompToggle.MouseButton1Click:Connect(function()
+	antiStompEnabled = not antiStompEnabled
+	antiStompToggle.BackgroundColor3 = antiStompEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	antiStompCircle.Position = antiStompEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+-- Auto Reset When HP < 5 (No extra GUI)
+RunService.Heartbeat:Connect(function()
+	if antiStompEnabled then
+		local character = localPlayer.Character
+		if character then
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
+			if humanoid and humanoid.Health > 0 and humanoid.Health < 5 then
+				humanoid.Health = 0
+			end
+		end
+	end
+end)
+
+local aimbotToggle, aimbotCircle = createToggle("Aim Bot", 180)
+local AimlockEnabled = false
+local Locked = false
+local Victim
+
+aimbotToggle.MouseButton1Click:Connect(function()
+	AimlockEnabled = not AimlockEnabled
+	aimbotToggle.BackgroundColor3 = AimlockEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	aimbotCircle.Position = AimlockEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+-- Aimbot Logic
+getgenv().Prediction = 0.13
+getgenv().AimPart = "Head"
+getgenv().Key = "q"
+getgenv().DisableKey = "p"
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+local AimlockEnabled = false
+local Locked = false
+local Victim
+
+aimbotToggle.MouseButton1Click:Connect(function()
+	AimlockEnabled = not AimlockEnabled
+	aimbotToggle.BackgroundColor3 = AimlockEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	aimbotCircle.Position = AimlockEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+local function getClosest()
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+			local part = player.Character:FindFirstChild(getgenv().AimPart)
+			if part then
+				local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+				if onScreen then
+					local distance = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+					if distance < shortestDistance then
+						closestPlayer = player
+						shortestDistance = distance
+					end
+				end
+			end
+		end
+	end
+	return closestPlayer
+end
+
+Mouse.KeyDown:Connect(function(key)
+	key = key:lower()
+	if key == getgenv().Key then
+		if AimlockEnabled then
+			Locked = not Locked
+			Victim = Locked and getClosest() or nil
+		end
+	elseif key == getgenv().DisableKey then
+		AimlockEnabled = false
+		Locked = false
+		Victim = nil
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if AimlockEnabled and Locked and Victim and Victim.Character and Victim.Character:FindFirstChild(getgenv().AimPart) then
+		local targetPart = Victim.Character[getgenv().AimPart]
+		local predictedPosition = targetPart.Position + targetPart.Velocity * getgenv().Prediction
+		local desiredCFrame = CFrame.new(Camera.CFrame.Position, predictedPosition)
+		Camera.CFrame = desiredCFrame
+	end
+end)
+
+
+
+
+
+
+
+
+-- Blue dot loop (only runs if toggle is on)
+RunService.Heartbeat:Connect(function()
+	if not dotAimbotEnabled then return end
+
+	local closest = getSilentTarget()
+	if closest then
+		if currentDotTarget ~= closest then
+			if currentDotTarget and currentDotTarget:FindFirstChild("DotMarker") then
+				currentDotTarget.DotMarker:Destroy()
+			end
+			local marker = Instance.new("BillboardGui")
+			marker.Name = "DotMarker"
+			marker.Size = UDim2.new(0, 10, 0, 10)
+			marker.Adornee = closest
+			marker.AlwaysOnTop = true
+			marker.Parent = closest
+
+			local dot = Instance.new("Frame")
+			dot.Size = UDim2.new(1, 0, 1, 0)
+			dot.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+			dot.BorderSizePixel = 0
+			dot.Parent = marker
+
+			local round = Instance.new("UICorner")
+			round.CornerRadius = UDim.new(1, 0)
+			round.Parent = dot
+
+			currentDotTarget = closest
+		end
+	end
+end)
+
+-- Only fire when toggle is ON and player clicks
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if not dotAimbotEnabled then return end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 and currentDotTarget then
+		local tool = localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Tool")
+		if tool then
+			for _, descendant in pairs(tool:GetDescendants()) do
+				if descendant:IsA("RemoteEvent") and descendant.Name:lower():find("fire") or descendant.Name:lower():find("remote") then
+					descendant:FireServer("Hit", currentDotTarget.Position, currentDotTarget)
+					break
+				end
+			end
+		end
+	end
+end)
+
+
+
+-- Right-side Toggle Creator
+local function createRightToggle(name, yPos)
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0, 100, 0, 20)
+	label.Position = UDim2.new(1, -180, 0, yPos)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.Font = Enum.Font.SourceSansBold
+	label.TextSize = 16
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = mainFrame
+
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 60, 0, 30)
+	button.Position = UDim2.new(1, -70, 0, yPos - 5)
+	button.BackgroundColor3 = Color3.fromRGB(160, 160, 160)
+	button.Text = ""
+	button.Parent = mainFrame
+
+	local corner = Instance.new("UICorner", button)
+	corner.CornerRadius = UDim.new(1, 0)
+
+	local circle = Instance.new("Frame", button)
+	circle.Size = UDim2.new(0, 26, 0, 26)
+	circle.Position = UDim2.new(0, 2, 0, 2)
+	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	circle.Parent = button
+
+	local circleCorner = Instance.new("UICorner", circle)
+	circleCorner.CornerRadius = UDim.new(1, 0)
+
+	return button, circle
+end
+
+
+
+-- Rapid Fire on Click
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 and rapidFireEnabled then
+		local char = localPlayer.Character
+		if not char then return end
+		local tool = char:FindFirstChildOfClass("Tool")
+		if tool then
+			for _, remote in pairs(tool:GetDescendants()) do
+				if remote:IsA("RemoteEvent") and (remote.Name:lower():find("fire") or remote.Name:lower():find("shoot")) then
+					-- Fire multiple shots instantly
+					for i = 1, 10 do
+						remote:FireServer("Hit", Mouse.Hit.Position, Mouse.Target)
+					end
+				end
+			end
+		end
+	end
+end)
+
+
+-- Fake Lag Toggle
+local fakeLagToggle, fakeLagCircle = createRightToggle("Fake Lag", 60)
+local fakeLagEnabled = false
+
+fakeLagToggle.MouseButton1Click:Connect(function()
+	fakeLagEnabled = not fakeLagEnabled
+	fakeLagToggle.BackgroundColor3 = fakeLagEnabled and Color3.fromRGB(0, 91, 150) or Color3.fromRGB(160, 160, 160)
+	fakeLagCircle.Position = fakeLagEnabled and UDim2.new(1, -28, 0, 2) or UDim2.new(0, 2, 0, 2)
+end)
+
+-- Simulated Heavier Fake Lag
+task.spawn(function()
+	while true do
+		task.wait(0.08) -- more frequent lag bursts
+		if fakeLagEnabled and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			local root = localPlayer.Character.HumanoidRootPart
+			root.Anchored = true
+			task.wait(0.18) -- hold lag longer
+			root.Anchored = false
+		end
+	end
+end)
